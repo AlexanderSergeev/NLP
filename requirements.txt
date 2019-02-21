@@ -1,0 +1,4 @@
+urllib3==1.24.1
+ftfy==5.5.1
+beautifulsoup4==4.7.1
+typing==3.6.6
