@@ -1,4 +1,4 @@
-from parser import parse_og_tags
+from ogparser import parse_og_tags
 import urllib3
 from urllib.parse import urljoin, urlparse
 urllib3.disable_warnings()
@@ -16,7 +16,7 @@ Link = namedtuple('Link', ['url', 'name'], defaults = [None, ''])
 
 class Connection:
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'
     }
 
     def __init__(self, timeout: float = 5.0, num_pools: int = 50, parser: str = 'html.parser') -> None:
