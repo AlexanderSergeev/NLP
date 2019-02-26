@@ -8,7 +8,6 @@ from collections import namedtuple
 from urllib.parse import urlparse
 from urllib3.exceptions import ReadTimeoutError, NewConnectionError, MaxRetryError
 from urllib3.response import HTTPResponse
-import logging
 
 def drop_query(url: str) -> str:
     return urlparse(url)._replace(query=None).geturl()
@@ -33,10 +32,9 @@ class Connection:
                 else:
                     return BeautifulSoup(r.data, self.parser)
             else:
-                logging.warning("Code %s at %d", r.status, link.url)
+                print("Code", r.status, "at", link.url)
         except (NewConnectionError, MaxRetryError, ReadTimeoutError) as e:
-            logging.error(e.__class__.__name__)
-            logging.error( "at %s", link.url)
+            print(e.__class__.__name__, "at", link.url)
     
     def children(self, link: Link, css: str, query: bool = True) -> Generator[Link, None, None]:
         page = self.get(link)

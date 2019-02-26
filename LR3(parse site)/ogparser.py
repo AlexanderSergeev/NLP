@@ -7,7 +7,6 @@ from ftfy import fix_text
 import re
 import atexit
 from urllib3.exceptions import IncompleteRead, ReadTimeoutError, ProtocolError
-import logging
 
 def preprocess(string: str) -> str:
     string = fix_text(string)
@@ -53,10 +52,10 @@ def parse_og_tags(r: HTTPResponse, tags: List[str], chunk_size: int = 128) -> di
             try:
                 chunk = streamer.read(chunk_size)
             except UnicodeDecodeError:
-                logging.error("Failed to decode chunk from %s", r.geturl())
+                print("Failed to decode chunk from", r.geturl())
                 return None
             except (ReadTimeoutError, IncompleteRead, ProtocolError):
-                logging.error("Broken connection at %s", r.geturl())
+                print("Broken connection at", r.geturl())
                 return None
             if parser.feed(chunk): 
                 break
