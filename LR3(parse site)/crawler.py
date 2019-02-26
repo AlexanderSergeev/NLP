@@ -10,23 +10,14 @@ class Crawler:
 
     def categories(self) -> Generator[Link, None, None]:
         root = Link('https://www.eurosport.ru/')
-        cats = self.conn.children(root, '.categorylist__item a')
+        cats = self.conn.children(root, '.categorylist__item > a')
         for cat in cats:
-            subcats = self.conn.children(cat, '.categorylist__item a')
+            subcats = self.conn.children(cat, '.categorylist__item > a')
             if subcats:
                 for subcat in subcats:
                     yield Link(subcat.url, cat.name + '/' + subcat.name)
             else:
                 yield cat
-
-    def get_stories(self) -> defaultdict:
-        res = defaultdict(set)
-        story_css = '.storylist-container__main-title a'
-        for cat in self.categories():
-            stories = self.conn.children(cat, story_css, query = False)
-            for story in stories:
-                res[story].add(cat.name)
-        return res
     
     def get_tags(self, links: List[Link]) -> Generator[Tuple[Link, dict], None, None]:
         res = self.exec.map(lambda x: self.conn.meta_tags(x, ['og:title', 'og:description']), links)
@@ -35,12 +26,13 @@ class Crawler:
                 yield link, tags
 
     def traverse(self) -> Generator[dict, None, None]:
-        for story, meta in self.get_stories().items():
-            links = self.conn.children(story, '.ob-dynamic-rec-container .ob-dynamic-rec-link')
-            for link, tags in self.get_tags(list(links)):
+        story_css = '.storylist-latest__main-title > a'
+        for cat in self.categories():
+            stories = self.conn.children(cat, story_css, query = False)
+            storiesList = list(stories)
+            for link, tags in self.get_tags(storiesList):
                 yield {
-                    'story': story.url,
-                    'meta': list(meta),
+                    'story': cat.url,
                     'url': link.url,
                     'title': tags['og:title'],
                     'descr': tags['og:description']
