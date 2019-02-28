@@ -10,18 +10,17 @@ class Crawler:
 
     def categories(self) -> Generator[Link, None, None]:
         root = Link('https://www.eurosport.ru/')
-        cats = self.conn.children(root, '.categorylist__item > a', scroll=False)
+        cats = self.conn.get_categories(root, '.allsports-desktop a')
 
         for cat in cats:
-            subcats = self.conn.children(cat, '.categorylist__item > a', scroll=False)
-            if subcats:
-                for subcat in subcats:
-                     yield Link(subcat.url, cat.name + '/' + subcat.name)
-            else:
-                if cat.url.__contains__("story"):
-                    yield cat
+            if cat.url.__contains__("football"):
+                subcats = self.conn.children(cat, '.categorylist__item > a', scroll=False)
+                if subcats:
+                    for subcat in subcats:
+                         yield Link(subcat.url, cat.name + '/' + subcat.name)
+
                 else:
-                    continue
+                    yield cat
 
     def get_tags(self, links: List[Link]) -> Generator[Tuple[Link, dict], None, None]:
         res = self.exec.map(lambda x: self.conn.meta_tags(x, ['og:title', 'og:description']), links)
@@ -32,16 +31,13 @@ class Crawler:
     def traverse(self) -> Generator[dict, None, None]:
         story_css = '.storylist-latest__main-title > a'
         for cat in self.categories():
-            if not self.story.__contains__(cat.url):
-                stories = self.conn.children(cat, story_css, query=False, scroll=True)
-                storiesList = list(stories)
-                for link, tags in self.get_tags(storiesList):
-                    yield {
-                        'story': cat.url,
-                        'url': link.url,
-                        'title': tags['og:title'],
-                        'descr': tags['og:description']
-                    }
-                self.story.append(cat.url)
-            else:
-                continue
+            stories = self.conn.children(cat, story_css, query=False, scroll=True)
+            storiesList = list(stories)
+            for link, tags in self.get_tags(storiesList):
+                yield {
+                    'story': cat.url,
+                    'url': link.url,
+                    'title': tags['og:title'],
+                    'descr': tags['og:description']
+                }
+            self.story.append(cat.url)

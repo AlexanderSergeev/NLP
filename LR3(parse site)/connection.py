@@ -52,7 +52,7 @@ class Connection:
                 self.browser.get(link.url)
                 time.sleep(0.1)
                 elem = self.browser.find_element_by_tag_name("body")
-                no_of_pagedowns = 1000
+                no_of_pagedowns = 2000
                 while no_of_pagedowns:
                     try:
                         elem.send_keys(Keys.PAGE_DOWN)
@@ -60,6 +60,7 @@ class Connection:
                         elem = self.browser.find_element_by_tag_name("body")
                         elem.send_keys(Keys.PAGE_DOWN)
                     no_of_pagedowns -= 1
+                time.sleep(1)
                 result = self.browser.page_source
             else:
                 request = self.http.request('GET', link.url, preload_content=not stream, headers=self.headers)
@@ -78,11 +79,24 @@ class Connection:
     def children(self, link: Link, css: str, query: bool = True, scroll: bool = True) -> Generator[Link, None, None]:
         page = self.get(link, scroll=scroll)
         if page:
-            for match in page.select(css):
-                url = urljoin(link.url, match['href'])
-                if not query:
-                    url = drop_query(url)
-                yield Link(url, match.text)
+            if len(page.select(css)) == 0:
+                yield link
+            else:
+                for match in page.select(css):
+                    url = urljoin(link.url, match['href'])
+                    if not query:
+                        url = drop_query(url)
+                    yield Link(url, match.text)
+
+    def get_categories(self, link: Link, selector: str) -> Generator[Link, None, None]:
+        self.browser.get(link.url)
+        time.sleep(0.1)
+        self.browser.find_element_by_css_selector('.hamburger_zone > button').click();
+        page = BeautifulSoup(self.browser.page_source, self.parser)
+        self.browser.find_element_by_xpath('//*[@id="modal_navallsport"]/div[1]').click();
+        for match in page.select(selector):
+            url = urljoin(link.url, match['href'])
+            yield Link(url, match.text)
 
     def meta_tags(self, link: Link, tags: List[str]) -> dict:
         r = self.get(link, stream=True, scroll=False)
