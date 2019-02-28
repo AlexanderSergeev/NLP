@@ -47,7 +47,7 @@ class Connection:
                 self.browser.get(link.url)
                 time.sleep(0.1)
                 elem = self.browser.find_element_by_tag_name("body")
-                no_of_pagedowns = 2000
+                no_of_pagedowns = 1000
                 while no_of_pagedowns:
                     try:
                         elem.send_keys(Keys.PAGE_DOWN)
