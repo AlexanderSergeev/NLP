@@ -42,6 +42,7 @@ def get_encoding(r: HTTPResponse) -> codecs.StreamReader:
         try:
             return codecs.getreader(encoding)
         except LookupError:
+            print("Encoding error")
             pass
 
 def parse_og_tags(r, tags: List[str], chunk_size: int = 128) -> dict:
@@ -57,10 +58,8 @@ def parse_og_tags(r, tags: List[str], chunk_size: int = 128) -> dict:
                     chunk = streamer.read(chunk_size)
                 except UnicodeDecodeError:
                     print("Failed to decode chunk from", r.geturl())
-                    return None
                 except (ReadTimeoutError, IncompleteRead, ProtocolError):
                     print("Broken connection at", r.geturl())
-                    return None
                 if parser.feed(chunk):
                     break
         r = r.read()

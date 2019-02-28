@@ -13,14 +13,12 @@ class Crawler:
         cats = self.conn.get_categories(root, '.allsports-desktop a')
 
         for cat in cats:
-            if cat.url.__contains__("football"):
-                subcats = self.conn.children(cat, '.categorylist__item > a', scroll=False)
-                if subcats:
-                    for subcat in subcats:
-                         yield Link(subcat.url, cat.name + '/' + subcat.name)
-
-                else:
-                    yield cat
+            subcats = self.conn.children(cat, '.categorylist__item > a', scroll=False)
+            if subcats:
+                for subcat in subcats:
+                    yield Link(subcat.url, cat.name + '/' + subcat.name)
+            else:
+                yield cat
 
     def get_tags(self, links: List[Link]) -> Generator[Tuple[Link, dict], None, None]:
         res = self.exec.map(lambda x: self.conn.meta_tags(x, ['og:title', 'og:description']), links)

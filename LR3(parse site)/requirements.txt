@@ -4,5 +4,5 @@ ftfy==5.5.1
 beautifulsoup4==4.7.1
 typing==3.6.6
 selenium==3.141.0 
-# download chromedriver from http://chromedriver.chromium.org/downloads 
+# !!! download chromedriver from http://chromedriver.chromium.org/downloads 
 # and add it to executable_path in connection.py
