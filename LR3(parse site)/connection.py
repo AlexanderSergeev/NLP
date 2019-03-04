@@ -37,7 +37,7 @@ class Connection:
             'user-agent = Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36')
 
         self.browser = webdriver.Chrome(chrome_options=options,
-                                        executable_path=r'/home/asergeev/Downloads/chromedriver_linux64/chromedriver',
+                                        executable_path=r'C:/Users/asergeev/Downloads/chromedriver_win32/chromedriver.exe',
                                         desired_capabilities=caps)
 
     def get(self, link: Link, stream: bool = False, scroll: bool = True) -> Union[BeautifulSoup, HTTPResponse]:
@@ -47,7 +47,7 @@ class Connection:
                 self.browser.get(link.url)
                 time.sleep(0.1)
                 elem = self.browser.find_element_by_tag_name("body")
-                no_of_pagedowns = 1000
+                no_of_pagedowns = 2000
                 while no_of_pagedowns:
                     try:
                         elem.send_keys(Keys.PAGE_DOWN)
